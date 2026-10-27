@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.0.0...v1.1.0) (2026-10-27)
+
+### :sparkles: Features
+
+* tell integrations whether a browser's Session is still signed in ([1e9f732](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/1e9f7324b72cfebc9893f91ffbcae4d5ac2d8a33))
+
 ## [1.0.0] (2026-10-27)
 
 ### :sparkles: Features
