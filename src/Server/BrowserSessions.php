@@ -55,4 +55,20 @@ final readonly class BrowserSessions
 
         return $session !== null && $session->isActive($this->clock->now()) ? $session : null;
     }
+
+    /**
+     * The account the website should treat the browser as signed in to, or
+     * null for a signed-out Session — including one whose Account Token has
+     * expired without a sign-out, which the Session record alone does not show.
+     */
+    public function account(Session $session): ?string
+    {
+        if ($session->accountTokenId === null || $session->accountId === null) {
+            return null;
+        }
+
+        $token = $this->storage->findAccountToken($session->accountTokenId);
+
+        return $token !== null && $token->isUsable($this->clock->now()) ? $session->accountId : null;
+    }
 }
