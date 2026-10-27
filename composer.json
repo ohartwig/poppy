@@ -29,15 +29,15 @@
         "ext-openssl": "*",
         "ext-sodium": "*",
         "psr/clock": "^1.0",
-        "psr/http-client": "^1.0",
-        "psr/http-factory": "^1.0",
+        "psr/http-client": "^1.0.3",
+        "psr/http-factory": "^1.1.0",
         "psr/http-message": "^1.1 || ^2.0"
     },
     "require-dev": {
         "doctrine/dbal": "^3.10 || ^4.0",
-        "infection/infection": "^0.35.4",
-        "nyholm/psr7": "^1.8",
-        "phpstan/phpstan": "^2.1",
+        "infection/infection": "^0.35.8",
+        "nyholm/psr7": "^1.8.2",
+        "phpstan/phpstan": "^2.3.2",
         "phpunit/phpunit": "^11.5 || ^12.0 || ^13.0",
         "symfony/rate-limiter": "^6.4 || ^7.4 || ^8.0"
     },
