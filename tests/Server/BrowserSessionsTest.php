@@ -40,6 +40,27 @@ final class BrowserSessionsTest extends TestCase
         self::assertSame($sessionId, $this->sessions()->current($sessionId)?->id);
     }
 
+    public function testTheAccountFollowsTheSignIn(): void
+    {
+        $sessionId = TestCompany::text($this->company->startSession($this->agent, 'usr_1'), 'session_id');
+        $sessions = $this->sessions();
+        $session = $sessions->current($sessionId);
+        self::assertNotNull($session);
+        self::assertNull($sessions->account($session));
+
+        $issued = (new \Koh\Poppy\Server\TokenIssuer($this->company->configuration, $this->company->storage, $this->company->clock))->accountToken($session, 'account-A', ['poppy:read']);
+        $this->company->storage->saveSession($session->signIn($issued->token, ['poppy:read']));
+        $signedIn = $sessions->current($sessionId);
+        self::assertNotNull($signedIn);
+        self::assertSame('account-A', $sessions->account($signedIn));
+
+        $this->company->clock->advance(7776000);
+        self::assertNull($sessions->account($signedIn), 'an expired Account Token signs the browser out');
+
+        $this->company->clock->advance($this->company->configuration->sessionLifetime);
+        self::assertNull($sessions->current($sessionId), 'an ended Session is gone');
+    }
+
     public function testRefusesAReplay(): void
     {
         $sessionId = TestCompany::text($this->company->startSession($this->agent, 'usr_1'), 'session_id');
