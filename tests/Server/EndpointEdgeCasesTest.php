@@ -166,7 +166,7 @@ final class EndpointEdgeCasesTest extends TestCase
     {
         $session = TestCompany::text($this->company->startSession($this->agent, 'usr_1'), 'session_id');
         $device = $this->device();
-        $poll = fn (): string => (string) (TestCompany::json($this->company->token($this->agent, ['grant_type' => TokenEndpoint::GRANT_DEVICE_CODE, 'device_code' => $device, 'session_id' => $session]))['error'] ?? 'tokens');
+        $poll = fn (): string => TestCompany::text(TestCompany::json($this->company->token($this->agent, ['grant_type' => TokenEndpoint::GRANT_DEVICE_CODE, 'device_code' => $device, 'session_id' => $session])) + ['error' => 'tokens'], 'error');
 
         self::assertSame('authorization_pending', $poll());
         $this->company->clock->advance(4);
@@ -246,7 +246,7 @@ final class EndpointEdgeCasesTest extends TestCase
             /** @var list<string> */
             public array $hits = [];
 
-            public function hit(string $bucket, string $key): ?int
+            public function hit(string $bucket, string $key): int
             {
                 $this->hits[] = $bucket . ':' . $key;
 

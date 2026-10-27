@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /** The error codes and statuses of Poppy 0.2, 4.2 and section 6, one by one. */
 final class PoppyErrorTest extends TestCase
 {
-    /** @return iterable<string, array{PoppyError, string, int}> */
+    /** @return iterable<int, array{PoppyError, string, int}> */
     public static function errors(): iterable
     {
         yield [PoppyError::invalidRequest('x'), 'invalid_request', 400];

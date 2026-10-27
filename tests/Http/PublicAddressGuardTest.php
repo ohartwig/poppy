@@ -177,10 +177,9 @@ final class PublicAddressGuardTest extends TestCase
 
     public function testTheFetcherSendsAnAcceptHeader(): void
     {
-        $seen = [];
-        $client = new class($seen) implements \Psr\Http\Client\ClientInterface {
-            /** @param list<string> $seen */
-            public function __construct(private array &$seen) {}
+        $client = new class implements \Psr\Http\Client\ClientInterface {
+            /** @var list<string> */
+            public array $seen = [];
 
             public function sendRequest(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\ResponseInterface
             {
@@ -191,7 +190,7 @@ final class PublicAddressGuardTest extends TestCase
         };
 
         $this->fetcher($client)->fetch('https://agent.example/x');
-        self::assertSame(['GET application/json'], $seen);
+        self::assertSame(['GET application/json'], $client->seen);
     }
 
     public function testATransportErrorIsAFetchFailure(): void

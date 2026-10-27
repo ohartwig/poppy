@@ -20,6 +20,8 @@ use Koh\Poppy\Server\RateLimiter;
 use Koh\Poppy\Server\Scopes;
 use Koh\Poppy\Server\ServerConfiguration;
 use Koh\Poppy\Server\Storage\InMemoryStorage;
+use Koh\Poppy\Server\Storage\PoppyStorage;
+use Koh\Poppy\Replay\ReplayGuard;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -40,18 +42,18 @@ final class TestCompany
 
     public readonly FakeHttpClient $http;
 
-    public readonly InMemoryStorage $storage;
+    public readonly PoppyStorage $storage;
 
     public readonly ServerConfiguration $configuration;
 
     public readonly PoppyServer $server;
 
     /** @param list<string> $blocked */
-    public function __construct(array $blocked = [], ?ServerConfiguration $configuration = null, ?RateLimiter $rateLimiter = null, bool $nonces = false)
+    public function __construct(array $blocked = [], ?ServerConfiguration $configuration = null, ?RateLimiter $rateLimiter = null, bool $nonces = false, ?PoppyStorage $storage = null, ?ReplayGuard $replayGuard = null, ?FrozenClock $clock = null)
     {
-        $this->clock = new FrozenClock();
+        $this->clock = $clock ?? new FrozenClock();
         $this->http = new FakeHttpClient();
-        $this->storage = new InMemoryStorage();
+        $this->storage = $storage ?? new InMemoryStorage();
         $this->configuration = $configuration ?? new ServerConfiguration(
             self::ISSUER,
             ['shop.example'],
@@ -70,7 +72,7 @@ final class TestCompany
         $this->server = new PoppyServer(
             $this->configuration,
             $this->storage,
-            new InMemoryReplayGuard(),
+            $replayGuard ?? new InMemoryReplayGuard(),
             new ListClientPolicy(block: $blocked),
             new JsonFetcher($this->http, $factory, new PublicAddressGuard(static fn (): array => ['93.184.216.34'])),
             $this->clock,

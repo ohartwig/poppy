@@ -119,6 +119,16 @@ Direct Sign-In, code entry for Device Sign-In, the account page where Personal
 Agents are disconnected — and calls `DirectSignIn`, `DeviceVerification` and
 `AccountDisconnector` from them.
 
+### Storage on Doctrine DBAL
+
+`Storage\Dbal\DbalStorage`, `DbalReplayGuard` and `DbalFeedbackSink` implement
+the storage ports on DBAL 3.10 or 4 — the DBAL both Sylius and TYPO3 run on.
+`PoppySchema::addTo($schema, $prefix)` describes the tables, for a Doctrine
+migration or as the source of a TYPO3 `ext_tables.sql`. The single-use
+operations are atomic in the database itself: the replay guard on a primary
+key, codes and device approvals on the affected-row count of the statement
+that takes them. `SymfonyRateLimiter` adapts `symfony/rate-limiter`.
+
 ### What the integration must get right
 
 - **Replay guard: atomic, shared.** `claim()` must be one set-if-absent
