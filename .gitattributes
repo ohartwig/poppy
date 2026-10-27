@@ -13,3 +13,4 @@
 /lefthook.yml export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml.dist export-ignore
+/.composer-require-checker.json export-ignore

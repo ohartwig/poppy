@@ -1,0 +1,19 @@
+{
+  "symbol-whitelist": [
+    "Doctrine\\DBAL\\Connection",
+    "Doctrine\\DBAL\\Exception\\UniqueConstraintViolationException",
+    "Doctrine\\DBAL\\Schema\\Schema",
+    "Doctrine\\DBAL\\Types\\Types",
+    "Symfony\\Component\\RateLimiter\\RateLimiterFactory"
+  ],
+  "php-core-extensions": [
+    "Core",
+    "date",
+    "filter",
+    "hash",
+    "pcre",
+    "random",
+    "spl",
+    "standard"
+  ]
+}
