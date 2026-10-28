@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.1...v1.1.2) (2026-10-28)
+
+### :repeat: Continuous Integrations
+
+* rely on the Packagist GitHub hook, no Packagist token ([130f0da](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/130f0da1cda16301701a9aa8ca1c30a1c62b52a1))
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.3 ([9dc20e5](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/9dc20e5006055b37fc32bfcc27389d39364220f2))
+
 ## [1.1.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.0...v1.1.1) (2026-10-27)
 
 ### :bug: Fixes
