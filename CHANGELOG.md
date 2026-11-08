@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.3...v1.1.4) (2026-11-08)
+
+### :repeat: Chores
+
+* **deps:** update composer packages ([40516f8](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/40516f8cd70740a9f2c92a43b0a671ce5b94b1cc))
+
 ## [1.1.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.2...v1.1.3) (2026-11-08)
 
 ### :white_check_mark: Tests
