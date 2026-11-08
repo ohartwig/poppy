@@ -35,9 +35,9 @@
     },
     "require-dev": {
         "doctrine/dbal": "^3.10 || ^4.0",
-        "infection/infection": "^0.35.8",
+        "infection/infection": "^0.35.10",
         "nyholm/psr7": "^1.8.2",
-        "phpstan/phpstan": "^2.3.3",
+        "phpstan/phpstan": "^2.3.5",
         "phpunit/phpunit": "^11.5 || ^12.0 || ^13.0",
         "symfony/rate-limiter": "^6.4 || ^7.4 || ^8.0"
     },
