@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.2...v1.1.3) (2026-11-08)
+
+### :white_check_mark: Tests
+
+* **server:** allow the rounding second in the rate-limiter retry ([ad2560d](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/ad2560d62487fd7236713b048a584c6d1df5ba5d))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([520d5f9](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/520d5f902be7a10755928e457a846548e9149f71))
+
 ## [1.1.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.1...v1.1.2) (2026-10-28)
 
 ### :repeat: Continuous Integrations
