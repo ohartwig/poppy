@@ -43,7 +43,11 @@ final class AdaptersTest extends TestCase
         self::assertNull($second);
         self::assertNotNull($retry);
         self::assertGreaterThanOrEqual(1, $retry);
-        self::assertLessThanOrEqual(60, $retry);
+        // 61, not 60: symfony/rate-limiter (8.1) answers with the window's end
+        // rounded up to the whole second, so a one-minute window that opened
+        // part-way through a second reports a retry 61 seconds from the start
+        // of the current one. Waiting that long is never too early.
+        self::assertLessThanOrEqual(61, $retry);
         self::assertNull($limiter->hit('token', 'b'), 'keys are counted apart');
         self::assertNull($limiter->hit('unconfigured', 'a'));
     }
