@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.4...v1.1.5) (2026-11-16)
+
+### :repeat: Chores
+
+* **deps:** update dependency infection/infection to ^0.35.11 ([8a86374](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/8a863748c3b62c40e63b06fc1272047379a83d24))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.246-8.5 ([784c141](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/784c1413ef90863d9e208c7eb05fe73b81120e09))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.173-8.5 ([b41c0fa](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/b41c0fa5590650c96d6d5d06d1f81e06e9cb3a1a))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.172-8.5 ([bfbad75](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/bfbad75d067972cf2f7a6a17b214b4c9033ba136))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.171-8.5 ([4dbee19](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/4dbee1981fee3164a67fc4808f9e70c207ecff50))
+
 ## [1.1.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.3...v1.1.4) (2026-11-08)
 
 ### :repeat: Chores
