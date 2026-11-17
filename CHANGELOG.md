@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.6...v1.1.7) (2026-11-17)
+
+### :bug: Fixes
+
+* **composer:** point homepage at the package page ([0eb8f8e](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/0eb8f8ee3df65d38c4c5de42a3b51bac3f1719ed))
+
 ## [1.1.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.5...v1.1.6) (2026-11-17)
 
 ### :repeat: Chores
