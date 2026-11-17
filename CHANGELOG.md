@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.5...v1.1.6) (2026-11-17)
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.6 ([36dbb70](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/36dbb70e67b8b942b79757c2346b3504d48cd8a2))
+
 ## [1.1.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.4...v1.1.5) (2026-11-16)
 
 ### :repeat: Chores
