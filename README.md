@@ -146,6 +146,11 @@ that takes them. `SymfonyRateLimiter` adapts `symfony/rate-limiter`.
   carry the rule that a Session never switches account in its statement
   (`… WHERE id = ? AND (account_id IS NULL OR account_id = ?)`), because a
   refresh, a sign-in and a sign-out can meet on one Session.
+- **Storage: a disconnect withdraws approved sign-ins.**
+  `cancelApprovedSignIns()` must remove the agent's authorization codes for
+  that account and move its approved device authorizations to denied.
+  `AccountDisconnector` calls it before it revokes the Account Tokens, so a
+  sign-in the User approved a minute earlier cannot be exchanged afterwards.
 - **HTTP client: no redirects, address pinning.** `PublicAddressGuard` checks
   the resolved addresses before the request; the HTTP client resolves again.
   Use a client that refuses private addresses at connect time (Symfony's
