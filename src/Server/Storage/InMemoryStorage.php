@@ -45,6 +45,18 @@ final class InMemoryStorage implements PoppyStorage
         return $this->sessions[$id] ?? null;
     }
 
+    public function signInSession(string $sessionId, AccountToken $token, array $scopes): bool
+    {
+        $session = $this->sessions[$sessionId] ?? null;
+        if ($session === null || ($session->accountId !== null && $session->accountId !== $token->accountId)) {
+            return false;
+        }
+
+        $this->sessions[$sessionId] = $session->signIn($token, $scopes);
+
+        return true;
+    }
+
     public function signOutSessions(string $accountTokenId): void
     {
         foreach ($this->sessions as $id => $session) {
@@ -174,6 +186,20 @@ final class InMemoryStorage implements PoppyStorage
         $this->devices[$deviceCodeHash] = $authorization->withStatus(DeviceStatus::Consumed);
 
         return $authorization;
+    }
+
+    public function cancelApprovedSignIns(string $accountId, string $clientId): void
+    {
+        $this->codes = array_filter(
+            $this->codes,
+            static fn (AuthorizationCode $code): bool => $code->accountId !== $accountId || $code->clientId !== $clientId,
+        );
+
+        foreach ($this->devices as $hash => $device) {
+            if ($device->status === DeviceStatus::Approved && $device->accountId === $accountId && $device->clientId === $clientId) {
+                $this->devices[$hash] = $device->withStatus(DeviceStatus::Denied);
+            }
+        }
     }
 
     public function purgeExpired(\DateTimeImmutable $now): void

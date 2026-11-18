@@ -37,9 +37,23 @@ use Koh\Poppy\Server\Model\SessionToken;
  */
 interface PoppyStorage
 {
+    /** Stores a new Session. A sign-in goes through signInSession(), a sign-out through signOutSessions(). */
     public function saveSession(Session $session): void;
 
     public function findSession(string $id): ?Session;
+
+    /**
+     * Signs a Session in under an Account Token, atomically: sets the account,
+     * the token and the scopes in one conditional statement. False when the
+     * Session does not exist or was ever signed in to another account (4.4);
+     * nothing is written then.
+     *
+     * The condition belongs in the statement. A Session read earlier may have
+     * been signed in to another account since.
+     *
+     * @param list<string> $scopes
+     */
+    public function signInSession(string $sessionId, AccountToken $token, array $scopes): bool;
 
     /** Signs out every Session currently signed in under this Account Token (4.9). */
     public function signOutSessions(string $accountTokenId): void;
@@ -92,6 +106,15 @@ interface PoppyStorage
 
     /** Moves an approved authorization to consumed, atomically; null unless it was approved. */
     public function consumeApprovedDeviceAuthorization(string $deviceCodeHash): ?DeviceAuthorization;
+
+    /**
+     * Withdraws what one Personal Agent was approved for on one account but
+     * has not exchanged yet: removes its authorization codes and moves its
+     * approved device authorizations to denied. Called when the User
+     * disconnects the agent, so a sign-in approved a minute earlier cannot be
+     * turned into a new Account Token afterwards.
+     */
+    public function cancelApprovedSignIns(string $accountId, string $clientId): void;
 
     /** Removes expired records. Called from a scheduled task, never on the request path. */
     public function purgeExpired(\DateTimeImmutable $now): void;

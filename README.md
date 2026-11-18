@@ -142,6 +142,10 @@ that takes them. `SymfonyRateLimiter` adapts `symfony/rate-limiter`.
   time. `recordDevicePoll()`, `approveDeviceAuthorization()` and
   `denyDeviceAuthorization()` must each change only their own fields, and only
   while the record is still pending — never write back a record read earlier.
+- **Storage: signing a Session in is conditional.** `signInSession()` must
+  carry the rule that a Session never switches account in its statement
+  (`… WHERE id = ? AND (account_id IS NULL OR account_id = ?)`), because a
+  refresh, a sign-in and a sign-out can meet on one Session.
 - **HTTP client: no redirects, address pinning.** `PublicAddressGuard` checks
   the resolved addresses before the request; the HTTP client resolves again.
   Use a client that refuses private addresses at connect time (Symfony's
