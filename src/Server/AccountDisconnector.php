@@ -51,9 +51,16 @@ final readonly class AccountDisconnector
         return $connections;
     }
 
-    /** Disconnects one Personal Agent from an account: every token it holds for it. */
+    /**
+     * Disconnects one Personal Agent from an account: every token it holds
+     * for it, and every sign-in the User approved for it that it has not
+     * exchanged yet. Those go first, so that none of them becomes a new token
+     * while the existing ones are being revoked.
+     */
     public function disconnect(string $accountId, string $clientId): void
     {
+        $this->storage->cancelApprovedSignIns($accountId, $clientId);
+
         foreach ($this->connections($accountId)[$clientId] ?? [] as $token) {
             $this->revoke($token);
         }
