@@ -25,9 +25,13 @@ use Koh\Poppy\Server\Storage\PoppyStorage;
  * whose WHERE clause still expects "approved". Whichever request's statement
  * affects the row wins; the other sees zero affected rows and gets nothing.
  *
+ * A pending device authorization is written by two requests, the poll and the
+ * User's decision, so its transitions are conditional UPDATEs as well: each
+ * sets only its own columns and expects "pending" in the WHERE clause.
+ *
  * "Save" is an upsert done as UPDATE-then-INSERT. That is not atomic, and does
- * not need to be: every record is written by the one request that owns it,
- * and the races that matter are the two above.
+ * not need to be: every record it writes belongs to the one request that
+ * saves it.
  */
 final readonly class DbalStorage implements PoppyStorage
 {
@@ -218,6 +222,33 @@ final readonly class DbalStorage implements PoppyStorage
             ->fetchAssociative();
 
         return $row === false ? null : self::deviceAuthorization($row);
+    }
+
+    public function recordDevicePoll(string $deviceCodeHash, \DateTimeImmutable $at, int $interval): void
+    {
+        $this->connection->update(
+            $this->prefix . 'device_authorization',
+            ['interval_seconds' => $interval, 'last_polled_at' => $at->getTimestamp()],
+            ['device_code_hash' => $deviceCodeHash, 'status' => DeviceStatus::Pending->value],
+        );
+    }
+
+    public function approveDeviceAuthorization(string $deviceCodeHash, string $accountId, array $grantedScopes): bool
+    {
+        return $this->connection->update(
+            $this->prefix . 'device_authorization',
+            ['status' => DeviceStatus::Approved->value, 'account_id' => $accountId, 'granted_scopes' => implode(' ', $grantedScopes)],
+            ['device_code_hash' => $deviceCodeHash, 'status' => DeviceStatus::Pending->value],
+        ) === 1;
+    }
+
+    public function denyDeviceAuthorization(string $deviceCodeHash): bool
+    {
+        return $this->connection->update(
+            $this->prefix . 'device_authorization',
+            ['status' => DeviceStatus::Denied->value],
+            ['device_code_hash' => $deviceCodeHash, 'status' => DeviceStatus::Pending->value],
+        ) === 1;
     }
 
     public function consumeApprovedDeviceAuthorization(string $deviceCodeHash): ?DeviceAuthorization

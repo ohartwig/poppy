@@ -163,8 +163,8 @@ final class DbalStorageTest extends TestCase
         $storage->saveDeviceAuthorization($device);
         self::assertNull($storage->consumeApprovedDeviceAuthorization('d1'), 'pending is not approved');
 
-        $storage->saveDeviceAuthorization($device->polled($this->clock->now(), 10));
-        $storage->saveDeviceAuthorization($device->approve('acc', ['poppy:read']));
+        $storage->recordDevicePoll('d1', $this->clock->now(), 10);
+        self::assertTrue($storage->approveDeviceAuthorization('d1', 'acc', ['poppy:read']));
         self::assertSame('d1', $storage->findDeviceAuthorizationByUserCode('BCDF-GHJK')?->deviceCodeHash);
 
         $taken = $storage->consumeApprovedDeviceAuthorization('d1');
