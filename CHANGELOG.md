@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.7...v1.1.8) (2026-11-18)
+
+### :repeat: Chores
+
+* **deps:** update dependency infection/infection to ^0.35.12 ([53bb1e5](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/53bb1e59228caf26113fec8bd2f59f1f90e39359))
+
 ## [1.1.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.6...v1.1.7) (2026-11-17)
 
 ### :bug: Fixes
