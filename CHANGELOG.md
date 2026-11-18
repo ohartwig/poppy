@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.2.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.2.0...v1.2.1) (2026-11-18)
+
+### :bug: Fixes
+
+* **http:** accept a host only in a form every parser reads alike ([e12d21a](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/e12d21a1c94f96643e57bb284a8881d2a9019c2f))
+
+### :memo: Documentation
+
+* **readme:** name four more things the integration must get right ([8c1567e](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/8c1567e40e429e41b2eab3f41b466fbf28297869))
+
 ## [1.2.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.8...v1.2.0) (2026-11-18)
 
 ### :sparkles: Features
