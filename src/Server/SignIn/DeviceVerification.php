@@ -54,21 +54,23 @@ final readonly class DeviceVerification
 
     /**
      * @param list<string> $approvedScopes a non-empty subset of the requested scopes; empty declines
+     *
+     * @return bool whether this call decided the authorization; false when it
+     *              was no longer pending — decided in another tab, or already used
      */
-    public function approve(DeviceAuthorization $authorization, string $accountId, array $approvedScopes): void
+    public function approve(DeviceAuthorization $authorization, string $accountId, array $approvedScopes): bool
     {
         $scopes = array_values(array_intersect($authorization->requestedScopes, $approvedScopes));
         if ($scopes === []) {
-            $this->deny($authorization);
-
-            return;
+            return $this->deny($authorization);
         }
 
-        $this->storage->saveDeviceAuthorization($authorization->approve($accountId, $scopes));
+        return $this->storage->approveDeviceAuthorization($authorization->deviceCodeHash, $accountId, $scopes);
     }
 
-    public function deny(DeviceAuthorization $authorization): void
+    /** @return bool whether this call decided the authorization; false when it was no longer pending */
+    public function deny(DeviceAuthorization $authorization): bool
     {
-        $this->storage->saveDeviceAuthorization($authorization->withStatus(DeviceStatus::Denied));
+        return $this->storage->denyDeviceAuthorization($authorization->deviceCodeHash);
     }
 }

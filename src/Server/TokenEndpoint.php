@@ -227,7 +227,10 @@ final readonly class TokenEndpoint
                 $tooSoon = $authorization->lastPolledAt !== null
                     && $now->getTimestamp() - $authorization->lastPolledAt->getTimestamp() < $authorization->interval;
                 $interval = $authorization->interval + ($tooSoon ? self::SLOW_DOWN_STEP : 0);
-                $this->storage->saveDeviceAuthorization($authorization->polled($now, $interval));
+                // Only the poll's own columns, and only while still pending: the
+                // record read above may be stale by now, and saving it whole
+                // would undo an approval given in between.
+                $this->storage->recordDevicePoll($hash, $now, $interval);
 
                 throw $tooSoon ? PoppyError::slowDown() : PoppyError::authorizationPending();
             case DeviceStatus::Approved:

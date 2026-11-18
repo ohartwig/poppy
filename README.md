@@ -137,6 +137,11 @@ that takes them. `SymfonyRateLimiter` adapts `symfony/rate-limiter`.
 - **Storage: two single-use operations.** `consumeAuthorizationCode()` and
   `consumeApprovedDeviceAuthorization()` must hand a record out at most once
   under concurrency.
+- **Storage: device transitions are conditional.** A pending device
+  authorization is written by the poll and by the User's decision at the same
+  time. `recordDevicePoll()`, `approveDeviceAuthorization()` and
+  `denyDeviceAuthorization()` must each change only their own fields, and only
+  while the record is still pending — never write back a record read earlier.
 - **HTTP client: no redirects, address pinning.** `PublicAddressGuard` checks
   the resolved addresses before the request; the HTTP client resolves again.
   Use a client that refuses private addresses at connect time (Symfony's

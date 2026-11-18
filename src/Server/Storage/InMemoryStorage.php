@@ -124,6 +124,46 @@ final class InMemoryStorage implements PoppyStorage
         return null;
     }
 
+    public function recordDevicePoll(string $deviceCodeHash, \DateTimeImmutable $at, int $interval): void
+    {
+        $authorization = $this->pendingDevice($deviceCodeHash);
+        if ($authorization !== null) {
+            $this->devices[$deviceCodeHash] = $authorization->polled($at, $interval);
+        }
+    }
+
+    public function approveDeviceAuthorization(string $deviceCodeHash, string $accountId, array $grantedScopes): bool
+    {
+        $authorization = $this->pendingDevice($deviceCodeHash);
+        if ($authorization === null) {
+            return false;
+        }
+
+        $this->devices[$deviceCodeHash] = $authorization->approve($accountId, $grantedScopes);
+
+        return true;
+    }
+
+    public function denyDeviceAuthorization(string $deviceCodeHash): bool
+    {
+        $authorization = $this->pendingDevice($deviceCodeHash);
+        if ($authorization === null) {
+            return false;
+        }
+
+        $this->devices[$deviceCodeHash] = $authorization->withStatus(DeviceStatus::Denied);
+
+        return true;
+    }
+
+    /** The stored record, read at the moment of the write, and only while it is pending. */
+    private function pendingDevice(string $deviceCodeHash): ?DeviceAuthorization
+    {
+        $authorization = $this->devices[$deviceCodeHash] ?? null;
+
+        return $authorization?->status === DeviceStatus::Pending ? $authorization : null;
+    }
+
     public function consumeApprovedDeviceAuthorization(string $deviceCodeHash): ?DeviceAuthorization
     {
         $authorization = $this->devices[$deviceCodeHash] ?? null;
