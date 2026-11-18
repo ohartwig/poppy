@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.3.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.2.1...v1.3.0) (2026-11-18)
+
+### :sparkles: Features
+
+* **storage:** add conditional session sign-in and sign-in withdrawal ([34b0e7b](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/34b0e7b4a51e2a5a685230cc8caf1c8b4130e0b9))
+
+### :bug: Fixes
+
+* **session:** keep a sign-out, the account binding and a usable Session under concurrency ([efa5d43](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/efa5d435d387fb809d8717db471d67186bcde607))
+
 ## [1.2.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.2.0...v1.2.1) (2026-11-18)
 
 ### :bug: Fixes
