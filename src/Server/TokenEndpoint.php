@@ -12,6 +12,7 @@ use Koh\Poppy\Client\AuthenticatedClient;
 use Koh\Poppy\Client\ClientAuthenticator;
 use Koh\Poppy\Dpop\DpopVerifier;
 use Koh\Poppy\Exception\PoppyError;
+use Koh\Poppy\Server\Model\AccountToken;
 use Koh\Poppy\Server\Model\DeviceStatus;
 use Koh\Poppy\Server\Model\Session;
 use Koh\Poppy\Server\Model\TokenType;
@@ -150,8 +151,17 @@ final readonly class TokenEndpoint
             if (!$session->belongsTo($client->clientId(), $userId)) {
                 throw PoppyError::invalidSession();
             }
-            if ($session->isSignedIn()) {
-                throw PoppyError::invalidGrant('A signed-in Session is renewed with its Account Token.');
+            if ($session->accountTokenId !== null) {
+                $accountToken = $this->storage->findAccountToken($session->accountTokenId);
+                if ($accountToken !== null && $accountToken->isUsable($this->clock->now())) {
+                    throw PoppyError::invalidGrant('A signed-in Session is renewed with its Account Token.');
+                }
+
+                // The Account Token expired, or is gone, without a sign-out.
+                // There is nothing left to renew the Session with, so it
+                // continues signed out instead of being stuck until it ends.
+                $this->storage->signOutSessions($session->accountTokenId);
+                $session = $session->signOut();
             }
         }
 
@@ -285,8 +295,7 @@ final readonly class TokenEndpoint
             }
         }
 
-        $session = $session->signIn($token, $scopes);
-        $this->storage->saveSession($session);
+        $session = $this->signInUnder($session, $token, $scopes);
 
         return $this->issuer->sessionTokenResponse($session, $type, $jkt, $resource, $scopes);
     }
@@ -308,10 +317,46 @@ final readonly class TokenEndpoint
         }
 
         $issued = $this->issuer->accountToken($session, $accountId, $scopes);
-        $session = $session->signIn($issued->token, $scopes);
-        $this->storage->saveSession($session);
+        try {
+            $session = $this->signInUnder($session, $issued->token, $scopes);
+        } catch (PoppyError $error) {
+            // The token was stored but is never handed out; do not leave it usable.
+            $this->storage->saveAccountToken($issued->token->revoke($this->clock->now()));
+
+            throw $error;
+        }
 
         return $this->issuer->sessionTokenResponse($session, $type, $jkt, $resource, $scopes, $issued);
+    }
+
+    /**
+     * Signs the Session in under an Account Token and returns it as it is
+     * stored now.
+     *
+     * The Session and the token were read earlier in this request, and other
+     * requests write both. So the "never switches account" rule (4.4) is part
+     * of the storage statement, and the token is read again after the write: a
+     * sign-out that revoked it in between has either already signed the
+     * Session out — then this request signed it back in and must undo that —
+     * or will do so after this request's write. Either way the Session ends
+     * signed out and no token response claims otherwise.
+     *
+     * @param list<string> $scopes
+     */
+    private function signInUnder(Session $session, AccountToken $token, array $scopes): Session
+    {
+        if (!$this->storage->signInSession($session->id, $token, $scopes)) {
+            throw PoppyError::accountMismatch();
+        }
+
+        $current = $this->storage->findAccountToken($token->id);
+        if ($current === null || !$current->isUsable($this->clock->now())) {
+            $this->storage->signOutSessions($token->id);
+
+            throw PoppyError::invalidGrant('The Account Token is unknown, expired or revoked.');
+        }
+
+        return $session->signIn($token, $scopes);
     }
 
     private function activeSession(mixed $sessionId): Session

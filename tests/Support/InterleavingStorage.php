@@ -17,13 +17,16 @@ use Koh\Poppy\Server\Storage\PoppyStorage;
 /**
  * Lets a test run a second request between the read and the write of a first.
  *
- * Arm it with afterNextDeviceRead(): the next findDeviceAuthorization() reads
- * the record, then runs the callback, then returns what it read — which by
- * then is stale, exactly as it is for a request that lost a race.
+ * Arm it with afterNextDeviceRead() or afterNextSessionRead(): the next
+ * findDeviceAuthorization() or findSession() reads the record, then runs the
+ * callback, then returns what it read — which by then is stale, exactly as it
+ * is for a request that lost a race.
  */
 final class InterleavingStorage implements PoppyStorage
 {
     private ?\Closure $afterDeviceRead = null;
+
+    private ?\Closure $afterSessionRead = null;
 
     public function __construct(private readonly PoppyStorage $inner) {}
 
@@ -51,9 +54,33 @@ final class InterleavingStorage implements PoppyStorage
         $this->inner->saveSession($session);
     }
 
+    /** @param \Closure(): void $concurrentRequest */
+    public function afterNextSessionRead(\Closure $concurrentRequest): void
+    {
+        $this->afterSessionRead = $concurrentRequest;
+    }
+
     public function findSession(string $id): ?Session
     {
-        return $this->inner->findSession($id);
+        $session = $this->inner->findSession($id);
+
+        $concurrentRequest = $this->afterSessionRead;
+        $this->afterSessionRead = null;
+        if ($concurrentRequest !== null) {
+            $concurrentRequest();
+        }
+
+        return $session;
+    }
+
+    public function signInSession(string $sessionId, AccountToken $token, array $scopes): bool
+    {
+        return $this->inner->signInSession($sessionId, $token, $scopes);
+    }
+
+    public function cancelApprovedSignIns(string $accountId, string $clientId): void
+    {
+        $this->inner->cancelApprovedSignIns($accountId, $clientId);
     }
 
     public function signOutSessions(string $accountTokenId): void

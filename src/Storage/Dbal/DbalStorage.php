@@ -29,6 +29,10 @@ use Koh\Poppy\Server\Storage\PoppyStorage;
  * User's decision, so its transitions are conditional UPDATEs as well: each
  * sets only its own columns and expects "pending" in the WHERE clause.
  *
+ * A Session is written by more than one request too — a refresh, a sign-in
+ * and a sign-out can meet on it — so signing in is one conditional UPDATE
+ * that carries the "never switches account" rule in its WHERE clause.
+ *
  * "Save" is an upsert done as UPDATE-then-INSERT. That is not atomic, and does
  * not need to be: every record it writes belongs to the one request that
  * saves it.
@@ -67,6 +71,24 @@ final readonly class DbalStorage implements PoppyStorage
             self::nullableString($row, 'account_token_id'),
             self::scopes($row, 'scopes'),
         );
+    }
+
+    public function signInSession(string $sessionId, AccountToken $token, array $scopes): bool
+    {
+        $table = $this->connection->quoteIdentifier($this->prefix . 'session');
+        $updated = $this->connection->executeStatement(
+            sprintf('UPDATE %s SET account_id = ?, account_token_id = ?, scopes = ? WHERE id = ? AND (account_id IS NULL OR account_id = ?)', $table),
+            [$token->accountId, $token->id, implode(' ', $scopes), $sessionId, $token->accountId],
+        );
+        if ($updated === 1) {
+            return true;
+        }
+
+        // MySQL reports zero rows when the row already held exactly these
+        // values, which is a sign-in that succeeded.
+        $session = $this->findSession($sessionId);
+
+        return $session !== null && $session->accountTokenId === $token->id && $session->scopes === $scopes;
     }
 
     public function signOutSessions(string $accountTokenId): void
@@ -265,6 +287,16 @@ final readonly class DbalStorage implements PoppyStorage
         );
 
         return $taken === 1 ? $authorization : null;
+    }
+
+    public function cancelApprovedSignIns(string $accountId, string $clientId): void
+    {
+        $this->connection->delete($this->prefix . 'authorization_code', ['account_id' => $accountId, 'client_id' => $clientId]);
+        $this->connection->update(
+            $this->prefix . 'device_authorization',
+            ['status' => DeviceStatus::Denied->value],
+            ['account_id' => $accountId, 'client_id' => $clientId, 'status' => DeviceStatus::Approved->value],
+        );
     }
 
     public function purgeExpired(\DateTimeImmutable $now): void
