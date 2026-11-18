@@ -31,7 +31,10 @@ final readonly class ListClientPolicy implements ClientPolicy
 
     public function accepts(string $clientId): bool
     {
-        if (self::matchesAny($clientId, $this->block)) {
+        // A client_id in a second spelling of a blocked one ("agent.example."
+        // for "agent.example") matches no entry, so it must not get as far as
+        // the lists.
+        if (!Url::isHttps($clientId) || self::matchesAny($clientId, $this->block)) {
             return false;
         }
 
