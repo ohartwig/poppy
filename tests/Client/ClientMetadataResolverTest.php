@@ -154,6 +154,17 @@ final class ClientMetadataResolverTest extends TestCase
         self::assertFalse($allowed->accepts('https://other.example/a.json'));
     }
 
+    public function testASecondSpellingOfABlockedClientIsNotAccepted(): void
+    {
+        $byHost = new ListClientPolicy(block: ['agent.example']);
+        $byUrl = new ListClientPolicy(block: ['https://agent.example/agent.json']);
+
+        self::assertFalse($byHost->accepts('https://agent.example/agent.json'));
+        self::assertFalse($byHost->accepts('https://agent.example./agent.json'), 'the trailing dot names the same server');
+        self::assertFalse($byUrl->accepts('https://agent.example./agent.json'));
+        self::assertFalse((new ListClientPolicy())->accepts('http://agent.example/agent.json'), 'even the open policy takes only HTTPS client_ids');
+    }
+
     private function resolver(): ClientMetadataResolver
     {
         return new ClientMetadataResolver(new JsonFetcher($this->http, new Psr17Factory(), new PublicAddressGuard(static fn (): array => ['93.184.216.34'])));

@@ -52,6 +52,34 @@ final class PublicAddressGuardTest extends TestCase
         yield 'IPv4-mapped public (refused: reach it directly)' => ['::ffff:93.184.216.34', false];
         yield 'NAT64 public' => ['64:ff9b::5db8:d822', false];
         yield 'not an address' => ['shop.example', false];
+        yield 'benchmarking 198.18/15, bottom' => ['198.18.0.1', false];
+        yield 'benchmarking 198.18/15, top' => ['198.19.255.255', false];
+        yield 'just below benchmarking' => ['198.17.255.255', true];
+        yield 'just above benchmarking' => ['198.20.0.1', true];
+        yield 'IETF protocol assignments' => ['192.0.0.8', false];
+        yield 'just above the IETF block' => ['192.0.1.1', true];
+        yield 'TEST-NET-1' => ['192.0.2.1', false];
+        yield 'just above TEST-NET-1' => ['192.0.3.1', true];
+        yield '6to4 relay anycast' => ['192.88.99.1', false];
+        yield 'next to 6to4 relay anycast' => ['192.88.98.1', true];
+        yield 'same third octet elsewhere' => ['192.89.99.1', true];
+        yield 'TEST-NET-2' => ['198.51.100.1', false];
+        yield 'next to TEST-NET-2' => ['198.51.101.1', true];
+        yield 'TEST-NET-3' => ['203.0.113.1', false];
+        yield 'next to TEST-NET-3' => ['203.0.112.1', true];
+        yield 'same octets in another /8' => ['204.0.113.1', true];
+        yield '192.x.0.y outside the IETF block' => ['192.5.0.1', true];
+        yield '192.x.2.y outside TEST-NET-1' => ['192.5.2.1', true];
+        yield '198.x.100.y outside TEST-NET-2' => ['198.5.100.1', true];
+        yield 'x.0.0.y outside the IETF block' => ['8.0.0.1', true];
+        yield 'x.51.100.y outside TEST-NET-2' => ['8.51.100.1', true];
+        yield '6to4 with an embedded private address' => ['2002:a00:1::1', false];
+        yield 'just above 6to4' => ['2003::1', true];
+        yield 'Teredo' => ['2001:0:a00:1::1', false];
+        yield 'just above Teredo' => ['2001:1::1', true];
+        yield 'IPv4-compatible loopback in hex' => ['::7f00:1', false];
+        yield 'IPv4-compatible, dotted' => ['::10.0.0.1', false];
+        yield 'not IPv4-compatible: one bit above ::/96' => ['0:0:0:0:0:1::1', true];
     }
 
     public function testAcceptsAPublicHostOnTheDefaultPort(): void
@@ -103,7 +131,15 @@ final class PublicAddressGuardTest extends TestCase
     {
         $guard = new PublicAddressGuard(static fn (): array => ['93.184.216.34']);
 
-        foreach (['http://agent.example/agent.json', 'https://agent.example:8443/agent.json', 'https://[::1]/x'] as $url) {
+        foreach ([
+            'http://agent.example/agent.json',
+            'https://agent.example:8443/agent.json',
+            'https://[::1]/x',
+            'https://127.1/x',
+            'https://0x7f.1/x',
+            'https://2130706433/x',
+            'https://agent.example./x',
+        ] as $url) {
             try {
                 $guard->assertAllowed($url);
                 self::fail($url . ' should be refused');

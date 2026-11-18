@@ -10,6 +10,7 @@ namespace Koh\Poppy\Tests\Server;
 use Koh\Poppy\Exception\PoppyError;
 use Koh\Poppy\Tests\Support\PersonalAgent;
 use Koh\Poppy\Tests\Support\TestCompany;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** A Personal Agent's browser joining a Session (Poppy 0.2, section 5). */
@@ -86,6 +87,24 @@ final class BrowserSessionsTest extends TestCase
 
         $this->expectException(PoppyError::class);
         $this->sessions()->join($this->agent->browserAssertion(self::ENDPOINT, 'usr_1', $sessionId, 'https://shop.example.evil.example/', $this->company->clock->now()));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function returnUrlsABrowserReadsDifferently(): iterable
+    {
+        yield 'backslash: a browser goes to evil.example' => ['https://evil.example\.shop.example/login'];
+        yield 'backslash before the path' => ['https://evil.example\@www.shop.example/'];
+        yield 'trailing dot' => ['https://shop.example./'];
+        yield 'encoded slash in the host' => ['https://evil.example%2f.shop.example/'];
+    }
+
+    #[DataProvider('returnUrlsABrowserReadsDifferently')]
+    public function testRefusesAReturnUrlWhoseHostIsNotPlain(string $returnTo): void
+    {
+        $sessionId = TestCompany::text($this->company->startSession($this->agent, 'usr_1'), 'session_id');
+
+        $this->expectException(PoppyError::class);
+        $this->sessions()->join($this->agent->browserAssertion(self::ENDPOINT, 'usr_1', $sessionId, $returnTo, $this->company->clock->now()));
     }
 
     public function testASessionAssertionIsNotABrowserAssertion(): void

@@ -80,14 +80,26 @@ final readonly class PublicAddressGuard implements AddressGuard
                 || $first === 0xff                             // multicast
                 || str_starts_with($packed, "\x00\x64\xff\x9b") // 64:ff9b::/96 NAT64 may reach anything
                 || str_starts_with($packed, "\x20\x01\x0d\xb8") // 2001:db8::/32 documentation
+                || str_starts_with($packed, "\x20\x02")         // 2002::/16 6to4 embeds an IPv4 address
+                || str_starts_with($packed, "\x20\x01\x00\x00") // 2001::/32 Teredo embeds an IPv4 address
+                || str_starts_with($packed, str_repeat("\x00", 12)) // ::/96 IPv4-compatible, e.g. ::7f00:1
             );
         }
 
-        // 100.64.0.0/10 (carrier-grade NAT) is not in PHP's reserved list.
         $first = ord($packed[0]);
         $second = ord($packed[1]);
+        $third = ord($packed[2]);
 
-        return !($first === 100 && ($second & 0xc0) === 64) && $first < 224;
+        // What PHP's reserved list leaves out.
+        return !(
+            ($first === 100 && ($second & 0xc0) === 64)          // 100.64.0.0/10 carrier-grade NAT
+            || ($first === 198 && ($second & 0xfe) === 18)       // 198.18.0.0/15 benchmarking, used internally by some networks
+            || ($first === 192 && $second === 0 && $third === 0) // 192.0.0.0/24 IETF protocol assignments
+            || ($first === 192 && $second === 0 && $third === 2) // 192.0.2.0/24 TEST-NET-1
+            || ($first === 192 && $second === 88 && $third === 99) // 192.88.99.0/24 6to4 relay anycast (deprecated)
+            || ($first === 198 && $second === 51 && $third === 100) // 198.51.100.0/24 TEST-NET-2
+            || ($first === 203 && $second === 0 && $third === 113) // 203.0.113.0/24 TEST-NET-3
+        ) && $first < 224;
     }
 
     /** @return list<string> */

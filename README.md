@@ -152,6 +152,25 @@ that takes them. `SymfonyRateLimiter` adapts `symfony/rate-limiter`.
   the internal one.
 - **Rate limits.** Implement `RateLimiter`, and rate-limit the device code
   entry page per client address: user codes are short by design.
+- **Rate limits: per address as well.** The token, revocation and device
+  authorization endpoints call `RateLimiter` with the `client_id` the request
+  names, before that client is authenticated. Anyone can name another agent's
+  `client_id` and use up its allowance, or name a new one with every request
+  and never run out. An unauthenticated request can also make the server fetch
+  a client metadata document. Put a limit per client address in front of the
+  three endpoints.
+- **Storage: one table prefix per issuer.** The tables carry no issuer. Two
+  Companies that share one prefix accept each other's Sessions and tokens.
+  A multisite installation needs one `DbalStorage` prefix, or one database,
+  per `ServerConfiguration`.
+- **HTTP client: stream the body.** `JsonFetcher` stops reading at 64 KB, which
+  only limits memory when the PSR-18 client streams the response. A client
+  that buffers has read the whole body by then; give it a size limit of its
+  own.
+- **Replay guard: not inside a transaction.** `DbalReplayGuard` claims an id
+  with an INSERT that is expected to fail when the id exists. On PostgreSQL a
+  failed statement aborts the surrounding transaction, so `claim()` must run
+  in autocommit.
 
 ## Requirements
 
