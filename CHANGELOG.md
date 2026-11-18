@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.2.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.8...v1.2.0) (2026-11-18)
+
+### :sparkles: Features
+
+* **storage:** add conditional device authorization transitions ([47478ff](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/47478ff68d0572eafd3b176635b3872f841aa5a7))
+
+### :bug: Fixes
+
+* **device:** keep a concurrent approval when a poll writes ([210dd9c](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/210dd9caa06326224f5a3b64090d1d3b54f70574))
+
 ## [1.1.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.1.7...v1.1.8) (2026-11-18)
 
 ### :repeat: Chores
