@@ -2,6 +2,16 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.3.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.3.0...v1.3.1) (2026-11-20)
+
+### :memo: Documentation
+
+* **readme:** name the storage rule for withdrawing approved sign-ins ([6a1523d](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/6a1523d65185cef915d7578c83fc470f8ef2d673))
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.7 ([15e6db1](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/commit/15e6db1afb5a012c9b6ffa69ad112fdb268ab0a1))
+
 ## [1.3.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/poppy/compare/v1.2.1...v1.3.0) (2026-11-18)
 
 ### :sparkles: Features
